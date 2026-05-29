@@ -95,3 +95,57 @@ def delete_task(task_id):
     conn.close()
 
     return deleted_rows > 0
+
+def get_pending_tasks():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT * FROM tasks
+        WHERE status = 'pending'
+        """
+    )
+
+    tasks = cursor.fetchall()
+
+    conn.close()
+
+    return tasks
+
+def get_completed_tasks():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT * FROM tasks
+        WHERE status = 'completed'
+        """
+    )
+
+    tasks = cursor.fetchall()
+
+    conn.close()
+
+    return tasks
+
+
+def search_tasks(keyword):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT * FROM tasks
+        WHERE title LIKE ?
+        OR description LIKE ?
+        """,
+        (f"%{keyword}%", f"%{keyword}%")
+    )
+
+    tasks = cursor.fetchall()
+
+    conn.close()
+
+    return tasks

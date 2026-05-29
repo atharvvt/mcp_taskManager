@@ -4,9 +4,22 @@ from database.operations import (
     get_tasks,
     get_task_by_id,
     update_task_status,
-    delete_task
-)
+    delete_task,
+    get_pending_tasks,
+    get_completed_tasks,
+    search_tasks
+    )
 
+def format_task(task):
+    return {
+        "id": task[0],
+        "title": task[1],
+        "description": task[2],
+        "status": task[3],
+        "priority": task[4],
+        "due_date": task[5],
+        "created_at": task[6]
+    }
 
 @mcp.tool()
 def list_tasks():
@@ -122,3 +135,36 @@ def remove_task(task_id: int):
         "success": True,
         "message": "Task deleted successfully"
     }
+
+
+@mcp.tool()
+def list_pending_tasks():
+    """
+    Get all pending tasks.
+    """
+
+    tasks = get_pending_tasks()
+
+    return [format_task(task) for task in tasks]
+
+
+@mcp.tool()
+def list_completed_tasks():
+    """
+    Get all completed tasks.
+    """
+
+    tasks = get_completed_tasks()
+
+    return [format_task(task) for task in tasks]
+
+
+@mcp.tool()
+def search_task(keyword: str):
+    """
+    Search tasks by keyword.
+    """
+
+    tasks = search_tasks(keyword)
+
+    return [format_task(task) for task in tasks]
