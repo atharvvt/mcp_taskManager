@@ -6,6 +6,5 @@ initialize_database()
 
 from tools.task_tools import *
 
-
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="stdio")
