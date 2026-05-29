@@ -1,0 +1,5 @@
+fastapi
+anthropic
+sentence-transformers
+chromadb
+mcp
