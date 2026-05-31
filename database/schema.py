@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     status TEXT DEFAULT 'pending',
     priority TEXT DEFAULT 'medium',
     due_date TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    embedding TEXT
 );
 """

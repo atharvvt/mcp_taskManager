@@ -1,5 +1,9 @@
+import json
+
 from database.db import get_connection
 from database.schema import TASKS_TABLE
+from services.embedding_service import embedding_to_json, generate_embedding
+
 
 
 def initialize_database():
@@ -7,22 +11,6 @@ def initialize_database():
     cursor = conn.cursor()
 
     cursor.execute(TASKS_TABLE)
-
-    conn.commit()
-    conn.close()
-
-
-def create_task(title, description):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        INSERT INTO tasks (title, description)
-        VALUES (?, ?)
-        """,
-        (title, description)
-    )
 
     conn.commit()
     conn.close()
@@ -61,13 +49,48 @@ def update_task_status(task_id, status):
     conn = get_connection()
     cursor = conn.cursor()
 
+    # Get current task
+    cursor.execute(
+        """
+        SELECT *
+        FROM tasks
+        WHERE id = ?
+        """,
+        (task_id,)
+    )
+
+    task = cursor.fetchone()
+
+    if not task:
+        conn.close()
+        return False
+
+    title = task[1]
+    description = task[2]
+    priority = task[4]
+
+    # Generate updated embedding
+    task_text = f"""
+    Task Title: {title}
+    Task Description: {description}
+    Status: {status}
+    Priority: {priority}
+    """
+
+    embedding = generate_embedding(task_text)
+
     cursor.execute(
         """
         UPDATE tasks
-        SET status = ?
+        SET status = ?,
+            embedding = ?
         WHERE id = ?
         """,
-        (status, task_id)
+        (
+            status,
+            json.dumps(embedding),
+            task_id
+        )
     )
 
     conn.commit()
@@ -96,6 +119,7 @@ def delete_task(task_id):
 
     return deleted_rows > 0
 
+
 def get_pending_tasks():
     conn = get_connection()
     cursor = conn.cursor()
@@ -112,6 +136,7 @@ def get_pending_tasks():
     conn.close()
 
     return tasks
+
 
 def get_completed_tasks():
     conn = get_connection()
@@ -149,3 +174,48 @@ def search_tasks(keyword):
     conn.close()
 
     return tasks
+
+
+def add_task(
+    title,
+    description,
+    status="pending",
+    priority="medium"
+):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+
+    task_text = f"""
+    Task Title: {title}
+    Task Description: {description}
+    Status: {status}
+    Priority: {priority}
+    """
+
+    embedding = generate_embedding(task_text)
+
+    cursor.execute("""
+        INSERT INTO tasks
+        (
+            title,
+            description,
+            status,
+            priority,
+            embedding
+        )
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        title,
+        description,
+        status,
+        priority,
+        embedding_to_json(embedding)
+    ))
+
+    task_id = cursor.lastrowid
+
+    conn.commit()
+    conn.close()
+
+    return task_id

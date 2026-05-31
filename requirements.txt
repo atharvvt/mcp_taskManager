@@ -3,3 +3,5 @@ anthropic
 sentence-transformers
 chromadb
 mcp
+sentence-transformers 
+numpy
