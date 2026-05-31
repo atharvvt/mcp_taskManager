@@ -7,8 +7,10 @@ from database.operations import (
     delete_task,
     get_pending_tasks,
     get_completed_tasks,
-    search_tasks
+    search_tasks,
+    add_task
     )
+from services.embedding_service import semantic_search
 
 def format_task(task):
     return {
@@ -21,60 +23,40 @@ def format_task(task):
         "created_at": task[6]
     }
 
-@mcp.tool()
-def list_tasks():
-    return str(get_tasks())
-
 
 @mcp.tool()
 def add_task(title: str, description: str):
-    create_task(title, description)
-
-    return "Task created successfully!"
-
-
-@mcp.tool()
-def list_tasks():
-    """
-    Get all tasks.
-    """
-
-    tasks = get_tasks()
-
-    return [
-        {
-            "id": task[0],
-            "title": task[1],
-            "description": task[2],
-            "status": task[3],
-            "priority": task[4],
-            "due_date": task[5],
-            "created_at": task[6]
-        }
-        for task in tasks
-    ]
-
-
-@mcp.tool()
-def add_task(title: str, description: str):
-    """
-    Create a new task.
-    """
-
-    create_task(title, description)
+    task_id = add_task(title, description)
 
     return {
         "success": True,
-        "message": "Task created successfully"
+        "task_id": task_id
     }
+
+@mcp.tool()
+def list_tasks():
+    tasks = get_tasks()
+    return [format_task(task) for task in tasks]
 
 
 @mcp.tool()
-def get_task(task_id: int):
-    """
-    Get task by ID.
-    """
+def add_task_tool(
+    title: str,
+    description: str
+):
+    task_id = add_task(
+        title,
+        description
+    )
 
+    return {
+        "success": True,
+        "task_id": task_id,
+        "message": "Task created successfully"
+    }
+
+@mcp.tool()
+def get_task(task_id: int):
     task = get_task_by_id(task_id)
 
     if not task:
@@ -83,23 +65,10 @@ def get_task(task_id: int):
             "message": "Task not found"
         }
 
-    return {
-        "id": task[0],
-        "title": task[1],
-        "description": task[2],
-        "status": task[3],
-        "priority": task[4],
-        "due_date": task[5],
-        "created_at": task[6]
-    }
-
+    return format_task(task)
 
 @mcp.tool()
 def mark_task_completed(task_id: int):
-    """
-    Mark task as completed.
-    """
-
     success = update_task_status(
         task_id,
         "completed"
@@ -116,13 +85,8 @@ def mark_task_completed(task_id: int):
         "message": "Task marked as completed"
     }
 
-
 @mcp.tool()
 def remove_task(task_id: int):
-    """
-    Delete a task.
-    """
-
     success = delete_task(task_id)
 
     if not success:
@@ -139,10 +103,6 @@ def remove_task(task_id: int):
 
 @mcp.tool()
 def list_pending_tasks():
-    """
-    Get all pending tasks.
-    """
-
     tasks = get_pending_tasks()
 
     return [format_task(task) for task in tasks]
@@ -150,10 +110,6 @@ def list_pending_tasks():
 
 @mcp.tool()
 def list_completed_tasks():
-    """
-    Get all completed tasks.
-    """
-
     tasks = get_completed_tasks()
 
     return [format_task(task) for task in tasks]
@@ -161,10 +117,34 @@ def list_completed_tasks():
 
 @mcp.tool()
 def search_task(keyword: str):
-    """
-    Search tasks by keyword.
-    """
-
     tasks = search_tasks(keyword)
 
     return [format_task(task) for task in tasks]
+
+@mcp.tool()
+def semantic_search_tasks(
+    query: str
+):
+    tasks = get_tasks()
+
+    results = semantic_search(tasks,query)
+
+    formatted = []
+
+    for score, task in results:
+
+        formatted.append(
+            {
+                "id": task[0],
+                "title": task[1],
+                "description": task[2],
+                "status": task[3],
+                "priority": task[4],
+                "similarity": round(
+                    float(score),
+                    4
+                )
+            }
+        )
+
+    return formatted
