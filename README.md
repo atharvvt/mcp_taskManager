@@ -1,22 +1,113 @@
-# MCP Task Manager
+# MCP AI Task Manager
 
-An AI-native task management system built using the Model Context Protocol (MCP), SQLite, and Python.
+An AI-powered task management system built with Python, SQLite, Sentence Transformers, FAISS, and the Model Context Protocol (MCP).
 
-This project exposes a local task management database as MCP tools, allowing AI assistants like Claude Desktop to autonomously interact with tasks using natural language.
+This project exposes a local task management database as MCP tools, allowing AI assistants such as Claude Desktop to create, search, prioritize, cluster, and manage tasks using natural language.
+
+Unlike traditional task managers, this system supports semantic search, vector embeddings, intelligent recommendations, and AI-driven task analysis.
 
 ---
 
 # Features
 
-* MCP server built using Python
-* SQLite-based persistent task storage
-* AI tool integration with Claude Desktop
-* CRUD task operations
-* Task search and filtering
-* Agent-friendly structured responses
-* Modular backend architecture
-* Local-first architecture
-* Foundation for semantic search and AI workflows
+## Core Task Management
+
+* Create tasks
+* Update tasks
+* Delete tasks
+* Mark tasks as completed
+* Search tasks by keyword
+* Filter pending and completed tasks
+* Due date management
+* Priority management
+
+## AI Features
+
+### Semantic Search
+
+Search tasks by meaning rather than exact keywords.
+
+Example:
+
+```text
+Find tasks related to machine learning
+```
+
+Returns relevant tasks even if they do not contain the exact words used in the query.
+
+---
+
+### Vector Embeddings
+
+Every task is automatically converted into a vector embedding using:
+
+```text
+Sentence Transformers
+all-MiniLM-L6-v2
+```
+
+Embeddings are stored directly inside SQLite.
+
+---
+
+### FAISS Vector Search
+
+Task retrieval is accelerated using Facebook AI Similarity Search (FAISS).
+
+Benefits:
+
+* Fast similarity search
+* Scalable retrieval
+* Vector indexing
+* Production-style architecture
+
+---
+
+### Related Task Recommendations
+
+Find tasks that are semantically similar.
+
+Example:
+
+```text
+Show tasks related to semantic search
+```
+
+Useful for identifying duplicate work and grouping related projects.
+
+---
+
+### Task Clustering
+
+Automatically groups tasks into semantic categories using KMeans clustering.
+
+Example output:
+
+```text
+Cluster 1
+- Learn MCP
+- Research semantic search
+
+Cluster 2
+- Buy fishing bait
+- Buy peanuts
+
+Cluster 3
+- Go karting
+- Go fishing
+```
+
+---
+
+### Smart Prioritization
+
+Tasks are ranked using:
+
+* Priority
+* Due date
+* Completion status
+
+This enables AI assistants to recommend the most important work first.
 
 ---
 
@@ -24,14 +115,18 @@ This project exposes a local task management database as MCP tools, allowing AI 
 
 ```text
 Claude Desktop
-      ↓
-MCP Protocol
-      ↓
+        ↓
+Model Context Protocol
+        ↓
 Python MCP Server
-      ↓
-Tool Layer
-      ↓
+        ↓
+Task Tools
+        ↓
 SQLite Database
+        ↓
+Stored Embeddings
+        ↓
+FAISS Vector Index
 ```
 
 ---
@@ -42,331 +137,174 @@ SQLite Database
 
 * Python
 * SQLite
-* MCP Python SDK
 
-## AI / Agent Layer
-
-* Claude Desktop
-* Model Context Protocol (MCP)
-
-## Upcoming AI Features
+## AI / ML
 
 * Sentence Transformers
-* Semantic Search
-* Local Embeddings
-* Ollama / Gemma Integration
+* FAISS
+* NumPy
+* Scikit-Learn
+
+## Agent Layer
+
+* MCP Python SDK
+* Claude Desktop
 
 ---
 
 # Project Structure
 
 ```text
-mcp_app/
-│
-├── database/
-│   ├── db.py
-│   ├── models.py
-│   ├── operations.py
-│   └── schema.py
-│
-├── tools/
-│   └── task_tools.py
-│
-├── services/
-│   └── embedding_service.py
-│
-├── server.py
-├── tasks.db
-├── README.md
-└── requirements.txt
+└── 📁mcp_app
+    └── 📁__pycache__
+        ├── main.cpython-314.pyc
+        ├── mcp_instance.cpython-314.pyc
+        ├── server.cpython-314.pyc
+    └── 📁config
+        ├── __init__.py
+    └── 📁database
+        └── 📁__pycache__
+            ├── __init__.cpython-314.pyc
+            ├── db.cpython-314.pyc
+            ├── init_db.cpython-314.pyc
+            ├── operations.cpython-314.pyc
+            ├── schema.cpython-314.pyc
+        └── 📁migrations
+            └── 📁__pycache__
+                ├── migrate_embeddings.cpython-314.pyc
+                ├── migrations.cpython-314.pyc
+            ├── migrate_embeddings.py
+            ├── migrations.py
+        ├── __init__.py
+        ├── db.py
+        ├── init_db.py
+        ├── models.py
+        ├── operations.py
+        ├── schema.py
+    └── 📁models
+        ├── __init__.py
+    └── 📁services
+        └── 📁__pycache__
+            ├── __init__.cpython-314.pyc
+            ├── cluster_tasks.cpython-314.pyc
+            ├── embedding_service.cpython-314.pyc
+            ├── embeddings.cpython-314.pyc
+            ├── faiss_service.cpython-314.pyc
+            ├── find_related_tasks.cpython-314.pyc
+            ├── semantic_search.cpython-314.pyc
+        ├── __init__.py
+        ├── cluster_tasks.py
+        ├── embedding_service.py
+        ├── faiss_service.py
+        ├── find_related_tasks.py
+        ├── semantic_search.py
+    └── 📁tests
+    └── 📁tools
+        └── 📁__pycache__
+            ├── __init__.cpython-314.pyc
+            ├── task_tools.cpython-314.pyc
+        ├── __init__.py
+        ├── task_tools.py
+    ├── main.py
+    ├── mcp_instance.py
+    ├── README.md
+    ├── requirements.txt
+    ├── server.py
+    └── tasks.db
 ```
 
 ---
 
-# MCP Tools
+# Available MCP Tools
 
-The server exposes multiple AI-callable tools.
+## Task Management
 
-## Available Tools
+* add_task
+* list_tasks
+* get_task
+* update_task
+* remove_task
+* mark_task_completed
 
-### list_tasks
+## Search
 
-Retrieve all tasks.
+* search_task
+* semantic_search_tasks
 
----
+## Analytics
 
-### add_task
+* recommend_related_tasks
+* group_tasks_by_topic
+* get_task_priorities
 
-Create a new task.
+## Productivity
 
-Parameters:
-
-* title
-* description
-
----
-
-### get_task
-
-Retrieve task by ID.
-
-Parameters:
-
-* task_id
-
----
-
-### mark_task_completed
-
-Mark a task as completed.
-
-Parameters:
-
-* task_id
+* list_pending_tasks
+* list_completed_tasks
+* list_tasks_due_today
+* list_tasks_due_this_week
+* list_overdue_tasks
 
 ---
 
-### remove_task
-
-Delete a task.
-
-Parameters:
-
-* task_id
-
----
-
-### search_task
-
-Search tasks using keywords.
-
-Parameters:
-
-* keyword
-
----
-
-### list_pending_tasks
-
-Retrieve all pending tasks.
-
----
-
-### list_completed_tasks
-
-Retrieve all completed tasks.
-
----
-
-# Database Schema
-
-## tasks table
-
-| Column      | Type      |
-| ----------- | --------- |
-| id          | INTEGER   |
-| title       | TEXT      |
-| description | TEXT      |
-| status      | TEXT      |
-| priority    | TEXT      |
-| due_date    | TEXT      |
-| created_at  | TIMESTAMP |
-
----
-
-# Installation
-
-## Clone Repository
-
-```bash
-git clone <your_repo_url>
-cd mcp_app
-```
-
----
-
-## Create Virtual Environment
-
-```bash
-python -m venv .venv
-```
-
----
-
-## Activate Virtual Environment
-
-### Windows
-
-```bash
-.venv\Scripts\activate
-```
-
-### Linux / Mac
-
-```bash
-source .venv/bin/activate
-```
-
----
-
-## Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Running the MCP Server
-
-```bash
-python server.py
-```
-
----
-
-# Running MCP Inspector
-
-Install MCP CLI:
-
-```bash
-pip install "mcp[cli]"
-```
-
-Run Inspector:
-
-```bash
-mcp dev server.py
-```
-
----
-
-# Claude Desktop Integration
-
-Add the following configuration inside:
+# Example Queries
 
 ```text
-claude_desktop_config.json
-```
-
-```json
-{
-  "mcp_servers": {
-    "task-manager": {
-      "command": "B:\\mcp_app\\.venv\\Scripts\\python.exe",
-      "args": [
-        "B:\\mcp_app\\server.py"
-      ]
-    }
-  }
-}
-```
-
-Restart Claude Desktop after saving.
-
----
-
-# Example Claude Interactions
-
-```text
-Show all my tasks
+Create a task to learn retrieval augmented generation
 ```
 
 ```text
-Create a task to learn semantic search
+Find tasks related to AI infrastructure
 ```
 
 ```text
-Complete the first task
+What should I work on first?
 ```
 
 ```text
-Remove duplicate tasks
+Group my tasks by topic
 ```
-
----
-
-# Current Capabilities
-
-* Persistent local task management
-* AI-controlled CRUD workflows
-* Local tool invocation through MCP
-* Multi-step AI reasoning using tools
-* Agent-friendly tool architecture
-
----
-
-# Future Roadmap
-
-## Semantic Search
-
-Use embeddings for meaning-based task retrieval.
-
-Example:
 
 ```text
-Find tasks related to backend optimization
+Show overdue tasks
+```
+
+```text
+Recommend related work
 ```
 
 ---
 
-## Offline AI Integration
+# Key Engineering Concepts Demonstrated
 
-Integrate local LLMs using:
-
-* Ollama
-* Gemma
-* Llama.cpp
-
----
-
-## AI Planning System
-
-Allow AI agents to:
-
-* prioritize tasks
-* summarize work
-* generate daily plans
-* automate workflows
+* MCP Server Development
+* AI Tool Engineering
+* Semantic Search
+* Vector Embeddings
+* FAISS Indexing
+* Recommendation Systems
+* Clustering Algorithms
+* SQLite Database Design
+* AI Agent Integration
+* Local-First AI Systems
 
 ---
 
-## Vector Database Support
+# Resume Description
 
-Potential future integrations:
-
-* ChromaDB
-* FAISS
-* LanceDB
+Built an AI-powered task management system using Python, SQLite, Sentence Transformers, FAISS, and the Model Context Protocol (MCP). Implemented semantic search, vector retrieval, task clustering, prioritization, recommendation systems, and AI-agent tooling for natural language task management.
 
 ---
 
-# Why This Project Matters
+# Future Improvements
 
-This project demonstrates:
-
-* AI tooling infrastructure
-* MCP protocol implementation
-* Backend architecture design
-* AI-agent interaction patterns
-* Local-first AI systems
-* Structured tool engineering
-
-This aligns closely with modern AI engineering workflows used in tools like Cursor, Claude Desktop, and AI agent frameworks.
-
----
-
-# Learning Outcomes
-
-Through this project I learned:
-
-* MCP server development
-* AI tool integration
-* SQLite database architecture
-* Tool-driven AI workflows
-* Agent-friendly API design
-* Semantic retrieval concepts
-* Local AI infrastructure patterns
+* Local LLM Integration (Ollama)
+* Retrieval-Augmented Generation (RAG)
+* ChromaDB Support
+* LanceDB Support
+* Automatic Task Categorization
+* AI Daily Planning Assistant
+* Multi-user Support
 
 ---
 
@@ -374,12 +312,12 @@ Through this project I learned:
 
 Atharv
 
-Computer Science student focused on:
+Computer Science Student
+
+Interests:
 
 * AI Engineering
-* Developer Tooling
+* Developer Tools
 * Generative AI
 * Local AI Systems
-* Game Development
-
----
+* Machine Learning Infrastructure
