@@ -5,3 +5,5 @@ chromadb
 mcp
 sentence-transformers 
 numpy
+scikit-learn
+faiss-cpu

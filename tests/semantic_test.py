@@ -1,4 +1,4 @@
-from services.embedding_service import semantic_search
+from services.semantic_search import semantic_search
 
 results = semantic_search(
     "AI infrastructure"
