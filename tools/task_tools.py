@@ -1,6 +1,5 @@
 from mcp_instance import mcp
 from database.operations import (
-    create_task,
     get_tasks,
     get_task_by_id,
     update_task_status,
@@ -8,7 +7,8 @@ from database.operations import (
     get_pending_tasks,
     get_completed_tasks,
     search_tasks,
-    add_task
+    add_task as add_task_db,
+    clear_tasks
     )
 from services.embedding_service import semantic_search
 
@@ -26,7 +26,7 @@ def format_task(task):
 
 @mcp.tool()
 def add_task(title: str, description: str):
-    task_id = add_task(title, description)
+    task_id = add_task_db(title, description)
 
     return {
         "success": True,
@@ -148,3 +148,15 @@ def semantic_search_tasks(
         )
 
     return formatted
+
+@mcp.tool()
+def clear_all_tasks():
+    tasks = get_tasks()
+
+    for task in tasks:
+        clear_tasks(task[0])
+
+    return {
+        "success": True,
+        "message": "All tasks cleared"
+    }

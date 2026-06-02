@@ -219,3 +219,12 @@ def add_task(
     conn.close()
 
     return task_id
+
+def clear_tasks():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM tasks")
+
+    conn.commit()
+    conn.close()

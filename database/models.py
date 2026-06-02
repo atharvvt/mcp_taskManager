@@ -10,3 +10,4 @@ class Task:
     priority: str
     due_date: str
     created_at: str
+    embeddings: list[float]

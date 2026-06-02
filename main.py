@@ -1,12 +1,12 @@
 from database.operations import (
     initialize_database,
-    create_task,
-    get_tasks
+    get_tasks,
+    add_task
 )
 
 initialize_database()
-
-create_task(
+            
+add_task(
     "Learn MCP",
     "Build MCP project"
 )
